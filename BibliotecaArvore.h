@@ -5,6 +5,27 @@
 #include <string.h>
 #include <locale.h>
 
+typedef struct NoArvore
+{
+    int info;
+    struct NoArvore *esq;
+    struct NoArvore *dir;
+}NoArv;
 
+typedef struct Arvore
+{
+    NoArv *raiz;
+}Arv;
 
-#endif // BIBLIOTECAARVORE_H_INCLUDED
+Arv* criaArvore()
+{
+    Arv *arvore = (Arv*) malloc(sizeof(Arv));
+
+    if (arvore != NULL) {
+        arvore->raiz = NULL;
+    }
+
+    return arvore;
+}
+
+#endif
