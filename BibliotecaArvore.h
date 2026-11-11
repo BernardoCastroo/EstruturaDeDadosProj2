@@ -75,9 +75,34 @@ NoArv* inserirIncidente(NoArv* raiz, Inci novoIncidente)
     return raiz;
 }
 
+void adicionarIncidente(NoArv* raiz)
+{
+    system("cls");
+    printf("\n\t==================================================\n");
+    printf("\t               REGISTRAR INCIDENTE                \n");
+    printf("\t==================================================\n");
+
+    Inci novo;
+
+    printf("\n\tDigite o ID do Incidente (2 digitos): ");
+    scanf("%d", &novo.N_U_Id);
+
+    printf("\tDigite o Codigo do Equipamento (4 digitos): ");
+    scanf("%d", &novo.id_equip);
+
+    printf("\tDigite a Gravidade (1-Baixa, 2-Media, 3-Alta): ");
+    scanf("%d", &novo.gravidade);
+    limpar_buffer();
+
+    inserirIncidente(raiz, novo);
+
+    printf("\n\tIncidente enviado para a arvore!\n");
+
+    printf("\n\t\t---APERTE ENTER PARA CONTINUAR---\n");
+}
+
 NoArv* BuscaIncidente(NoArv* raiz,int Incidente)//arrumar n é void
 {
-
     if(raiz!=NULL)
     {
         if(Incidente <= raiz->info.N_U_Id)
@@ -107,26 +132,43 @@ void passa_Incidente(NoArv* raiz)
         printf("\t!!!Sem incidentes!!!\n");
         printf("\t\t\t---APERTE ENTER PARA CONTINUAR---\n");
         getchar();
-        return;
-    }
-    printf("\tDigite o código do Incidente a ser consultado:");
-    scanf("%d", &Incidente);
-
-    limpar_buffer();
-
-    NoArv* res=BuscaIncidente(raiz,Incidente);
-
-    if (res!=NULL)
-    {
-        printf("\n\t--- Incidente Encontrado ---\n");
-        printf("\tID do Incidente: %d\n", res->info.N_U_Id);
-        printf("\tID do Equipamento associado: %d\n", res->info.id_equip);
-        printf("\tNivel de Gravidade: %d\n", res->info.gravidade);
 
     }
     else{
-        printf("Incidente não encontrado");
+        printf("\tDigite o código do Incidente a ser consultado:");
+        scanf("%d", &Incidente);
+
+        limpar_buffer();
+
+        NoArv* res=BuscaIncidente(raiz,Incidente);
+
+        if (res!=NULL)
+        {
+            printf("\n\t--- Incidente Encontrado ---\n");
+            printf("\tID do Incidente: %d\n", res->info.N_U_Id);
+            printf("\tID do Equipamento associado: %d\n", res->info.id_equip);
+            printf("\tNivel de Gravidade: %d\n", res->info.gravidade);
+
+        }
+        else{
+            printf("Incidente não encontrado");
+        }
     }
+}
+
+void ListaIncidentes(NoArv* raiz)
+{
+    if(raiz!=NULL)
+    {
+        ListaIncidentes(raiz->esq);
+
+        printf("\t%-15d | %-16d | %-10d\n",
+               raiz->info.N_U_Id, raiz->info.id_equip, raiz->info.gravidade);
+        printf("\t--------------------------------------------------\n");
+
+        ListaIncidentes(raiz->dir);
+    }
+
 }
 
 #endif
