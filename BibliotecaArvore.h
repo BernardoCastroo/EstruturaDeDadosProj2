@@ -42,6 +42,7 @@ int ArvVazia(Arv* A) {
     if (A->raiz == NULL) {
         return 1;
     }
+    return 0;
 }
 
 void limpar_buffer() {
@@ -72,6 +73,60 @@ NoArv* inserirIncidente(NoArv* raiz, Inci novoIncidente)
     }
 
     return raiz;
+}
+
+NoArv* BuscaIncidente(NoArv* raiz,int Incidente)//arrumar n é void
+{
+
+    if(raiz!=NULL)
+    {
+        if(Incidente <= raiz->info.N_U_Id)
+        {
+            if(Incidente==raiz->info.N_U_Id)
+            {
+                return raiz;
+            }
+            return BuscaIncidente(raiz->esq, Incidente);
+        }
+        if(Incidente >= raiz->info.N_U_Id)
+        {
+            if(Incidente==raiz->info.N_U_Id)
+            {
+                return raiz;
+            }
+            return BuscaIncidente(raiz->dir, Incidente);
+        }
+    }
+    return NULL;
+}
+
+void passa_Incidente(NoArv* raiz)
+{
+    int Incidente, achou=0;
+    if(raiz==NULL){
+        printf("\t!!!Sem incidentes!!!\n");
+        printf("\t\t\t---APERTE ENTER PARA CONTINUAR---\n");
+        getchar();
+        return;
+    }
+    printf("\tDigite o código do Incidente a ser consultado:");
+    scanf("%d", &Incidente);
+
+    limpar_buffer();
+
+    NoArv* res=BuscaIncidente(raiz,Incidente);
+
+    if (res!=NULL)
+    {
+        printf("\n\t--- Incidente Encontrado ---\n");
+        printf("\tID do Incidente: %d\n", res->info.N_U_Id);
+        printf("\tID do Equipamento associado: %d\n", res->info.id_equip);
+        printf("\tNivel de Gravidade: %d\n", res->info.gravidade);
+
+    }
+    else{
+        printf("Incidente não encontrado");
+    }
 }
 
 #endif
