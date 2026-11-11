@@ -75,7 +75,7 @@ NoArv* inserirIncidente(NoArv* raiz, Inci novoIncidente)
     return raiz;
 }
 
-void adicionarIncidente(NoArv* raiz)
+void adicionarIncidente(Arv* arvore)
 {
     system("cls");
     printf("\n\t==================================================\n");
@@ -94,14 +94,14 @@ void adicionarIncidente(NoArv* raiz)
     scanf("%d", &novo.gravidade);
     limpar_buffer();
 
-    inserirIncidente(raiz, novo);
+    arvore->raiz=inserirIncidente(arvore->raiz, novo);
 
     printf("\n\tIncidente enviado para a arvore!\n");
 
     printf("\n\t\t---APERTE ENTER PARA CONTINUAR---\n");
 }
 
-NoArv* BuscaIncidente(NoArv* raiz,int Incidente)//arrumar n é void
+NoArv* BuscaIncidente(NoArv* raiz,int Incidente)
 {
     if(raiz!=NULL)
     {
@@ -127,12 +127,11 @@ NoArv* BuscaIncidente(NoArv* raiz,int Incidente)//arrumar n é void
 
 void passa_Incidente(NoArv* raiz)
 {
-    int Incidente, achou=0;
+    int Incidente;
     if(raiz==NULL){
         printf("\t!!!Sem incidentes!!!\n");
         printf("\t\t\t---APERTE ENTER PARA CONTINUAR---\n");
         getchar();
-
     }
     else{
         printf("\tDigite o código do Incidente a ser consultado:");
@@ -148,10 +147,14 @@ void passa_Incidente(NoArv* raiz)
             printf("\tID do Incidente: %d\n", res->info.N_U_Id);
             printf("\tID do Equipamento associado: %d\n", res->info.id_equip);
             printf("\tNivel de Gravidade: %d\n", res->info.gravidade);
+            printf("\t\t\t---APERTE ENTER PARA CONTINUAR---\n");
+            getchar();
 
         }
         else{
-            printf("Incidente não encontrado");
+            printf("\n\tIncidente não encontrado");
+            printf("\t\t\t---APERTE ENTER PARA CONTINUAR---\n");
+            getchar();
         }
     }
 }
@@ -168,7 +171,108 @@ void ListaIncidentes(NoArv* raiz)
 
         ListaIncidentes(raiz->dir);
     }
-
 }
 
+NoArv* removerIncidente(NoArv* raiz,int remove_inci)
+{
+    if(raiz == NULL)
+    {
+        return NULL;
+    }
+    else
+    {
+
+        if(remove_inci == raiz->info.N_U_Id)
+        {
+            if(raiz->esq == NULL && raiz->dir==NULL)
+            {
+                free(raiz);
+                return NULL;
+            }
+            if(raiz->esq == NULL && raiz->dir!=NULL)// ver com a luciaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+            {
+                NoArv* aux = raiz->dir;
+                free(raiz);
+                raiz = aux;             // se poderia ser apenas return aux.
+                return raiz;
+            }
+            if(raiz->esq != NULL && raiz->dir==NULL)// ver com a luciaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+            {
+                NoArv* aux = raiz->esq;
+                free(raiz);
+                raiz = aux;
+                return raiz;
+            }
+
+            NoArv* atual = raiz->esq;
+            while (atual->dir != NULL)// maior da esqueda
+            {
+                atual = atual->dir;
+            }
+
+            raiz->info= atual->info;
+            raiz->esq = removerIncidente(raiz->esq, atual->info.N_U_Id);
+
+            return raiz;
+
+        }
+        if(remove_inci < raiz->info.N_U_Id)
+        {
+            raiz->esq = removerIncidente(raiz->esq, remove_inci);
+            return raiz;
+        }
+        if(remove_inci > raiz->info.N_U_Id)
+        {
+            raiz->dir = removerIncidente(raiz->dir, remove_inci);
+            return raiz;
+        }
+
+    }
+}
+
+void excluirInsidente(Arv* arvore)
+{
+    system("cls");
+    int remover;
+    if(ArvVazia(arvore) || arvore->raiz == NULL)
+    {
+        printf("\t!!!Sem incidentes!!!\n");
+        printf("\t\t\t---APERTE ENTER PARA CONTINUAR---\n");
+        getchar();
+    }
+    else{
+        printf("\tDigite o código do Incidente a ser removido:");
+        scanf("%d", &remover);
+
+        limpar_buffer();
+
+        NoArv* res= BuscaIncidente(arvore->raiz,remover);
+
+        if (res!=NULL)
+        {
+            printf("\n\t--- Incidente Removido ---\n");
+            printf("\tID do Incidente: %d\n", res->info.N_U_Id);
+            printf("\tID do Equipamento associado: %d\n", res->info.id_equip);
+            printf("\tNivel de Gravidade: %d\n", res->info.gravidade);
+            printf("\t\t\t---APERTE ENTER PARA CONTINUAR---\n");
+            getchar();
+
+            arvore->raiz = removerIncidente(arvore->raiz, remover);
+        }
+        else{
+            printf("\n\tIncidente não encontrado");
+            printf("\t\t\t---APERTE ENTER PARA CONTINUAR---\n");
+            getchar();
+        }
+    }
+}
+void liberarArvore(NoArv* raiz)
+{
+    if (raiz != NULL)
+    {
+        liberarArvore(raiz->esq);
+        liberarArvore(raiz->dir);
+        free(raiz);
+    }
+}
 #endif

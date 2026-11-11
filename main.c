@@ -37,7 +37,7 @@ void menu(Arv* Arvore)
                 break;
 
             case 2:
-                adicionarIncidente(Arvore->raiz);
+                adicionarIncidente(Arvore);
                 getchar();
                 break;
 
@@ -49,8 +49,6 @@ void menu(Arv* Arvore)
 
                 passa_Incidente(Arvore->raiz);
 
-                printf("\n\t\t---APERTE ENTER PARA CONTINUAR---\n");
-                getchar();
                 break;
 
             case 4:
@@ -60,12 +58,12 @@ void menu(Arv* Arvore)
                 printf("\t==================================================\n");
                 printf("\t%-15s | %-16s | %-10s\n",
                            "ID_INCIDENTE", "ID_EQUIPAMENTO", "GRAVIDADE");
-                printf("\t--------------------------------------------------\n");
-
                 ListaIncidentes(Arvore->raiz);
 
+                printf("\t==================================================\n");
                 printf("\n\t\t---APERTE ENTER PARA CONTINUAR---\n");
                 getchar();
+                break;
                 break;
 
             case 5:
@@ -73,12 +71,8 @@ void menu(Arv* Arvore)
                 printf("\n\t==================================================\n");
                 printf("\t                 EXCLUIR INCIDENTE                \n");
                 printf("\t==================================================\n");
-                printf("\n\t[Aguardando funcao Excluir...]\n");
-
-                printf("\n\t\t---APERTE ENTER PARA CONTINUAR---\n");
-                getchar();
+                excluirInsidente(Arvore);
                 break;
-
             case 6:
                 system("cls");
                 printf("\n\t==================================================\n");
@@ -92,8 +86,8 @@ void menu(Arv* Arvore)
 
             case 7:
                 system("cls");
-                // Aqui vais libertar a árvore e a hash quando as funções estiverem prontas
-                // libertarArvore(Arvore);
+                liberarArvore(Arvore->raiz);
+                free(Arvore);
                 printf("\n\t==================================================\n");
                 printf("\t             FINALIZANDO O PROGRAMA...            \n");
                 printf("\t==================================================\n\n");
