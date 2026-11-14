@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <locale.h>
+#define Tam_hash 61// 52/61=~0,85
 
 typedef struct Incidentes
 {
@@ -11,12 +12,14 @@ typedef struct Incidentes
     int id_equip;
     int gravidade;
 } Inci;
+
 typedef struct Equipamento
 {
     int C_U_Id;
     char nome[10];
 
 }Equip;
+
 typedef struct NoArvore
 {
     Inci info;
@@ -38,6 +41,43 @@ Arv* criaArvore()
     return arvore;
 }
 
+typedef struct NoHash
+{
+    Equip info;
+    struct NoHash *prox;
+}NoHash;
+
+typedef struct Tab_hash
+{
+    NoHash *hash[Tam_hash];
+}Tab_hash;
+
+Tab_hash *CriaHash()
+{
+    Tab_hash* tabela = (Tab_hash*) malloc(sizeof(Tab_hash));
+
+    if (tabela != NULL)
+    {
+        for(int i = 0; i< Tam_hash; i++)
+        {
+            tabela->hash[i] = NULL;
+        }
+    }
+    return tabela;
+}
+
+int HashVazia(Tab_hash *tabela)
+{
+    for(int i = 0; i< Tam_hash; i++)
+    {
+        if(tabela->hash[i] != NULL)
+        {
+            return 0;
+        }
+    }
+    return 1;
+}
+
 int ArvVazia(Arv* A) {
     if (A->raiz == NULL) {
         return 1;
@@ -49,6 +89,83 @@ void limpar_buffer() {
     int c;
     while ((c = getchar()) != '\n' && c != EOF);
 }
+
+int funcaoHash(int codigo)
+{
+    return codigo%Tam_hash;
+}
+
+void inserirEquipamento(Tab_hash* tabela, Equip novoEquip)
+{
+    int indice = funcaoHash(novoEquip.C_U_Id);
+
+    NoHash* novo = (NoHash*) malloc(sizeof(NoHash));
+
+    novo->info=novoEquip;
+
+    novo->prox= tabela->hash[indice];
+
+    tabela->hash[indice]= novo;
+}
+
+NoHash* buscarEquipamento(Tab_hash* tabela, int codigo)
+{
+    int indice= funcaoHash(codigo);
+
+    NoHash* atual = tabela->hash[indice];
+
+    while(atual != NULL)
+    {
+        if(atual->info.C_U_Id == codigo)
+        {
+            return atual;
+        }
+        atual= atual->prox;
+    }
+    return NULL;
+}
+
+int removerEquipamento (Tab_hash* tabela, int codigo)
+{
+    int indice= funcaoHash(codigo);
+    NoHash* atual = tabela->hash[indice];
+    NoHash* ante = NULL;
+
+    while (atual != NULL)
+    {
+        if(atual->info.C_U_Id == codigo)
+        {
+            if(ante ==NULL)
+            {
+                tabela->hash[indice] = atual->prox;
+            }
+            else
+            {
+                ante->prox = atual->prox;
+            }
+            free(atual);
+            return 1;
+        }
+
+        ante=atual;
+        atual=atual->prox;
+    }
+    return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+//ARVORE
 
 NoArv* inserirIncidente(NoArv* raiz, Inci novoIncidente)
 {

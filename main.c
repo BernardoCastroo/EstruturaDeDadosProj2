@@ -41,7 +41,7 @@ void menu(Arv* Arvore)
                 getchar();
                 break;
 
-            case 3:
+            case 3://mostrar as coisa da HAsh
                 system("cls");
                 printf("\n\t==================================================\n");
                 printf("\t         CONSULTAR EQUIPAMENTO E INCIDENTE        \n");
@@ -84,7 +84,7 @@ void menu(Arv* Arvore)
                 getchar();
                 break;
 
-            case 7:
+            case 7:// liberar a tabela Hash
                 system("cls");
                 liberarArvore(Arvore->raiz);
                 free(Arvore);
