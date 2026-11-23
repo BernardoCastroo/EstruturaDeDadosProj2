@@ -1,6 +1,6 @@
 #include "BibliotecaArvore.h"
 
-void menu(Arv* Arvore)
+void menu(Arv* Arvore, Tab_hash* TabelaHash)
 {
     int opc;
     do {
@@ -25,15 +25,8 @@ void menu(Arv* Arvore)
 
         switch(opc)
         {
-            case 1://fazer a hash
-                system("cls");
-                printf("\n\t==================================================\n");
-                printf("\t             CADASTRAR EQUIPAMENTO                \n");
-                printf("\t==================================================\n");
-
-
-                printf("\n\t\t---APERTE ENTER PARA CONTINUAR---\n");
-                getchar();
+            case 1:
+                adicionarEquipamento(TabelaHash);
                 break;
 
             case 2:
@@ -48,7 +41,6 @@ void menu(Arv* Arvore)
                 printf("\t==================================================\n\n");
 
                 passa_Incidente(Arvore->raiz);
-
                 break;
 
             case 4:
@@ -84,9 +76,10 @@ void menu(Arv* Arvore)
                 getchar();
                 break;
 
-            case 7:// liberar a tabela Hash
+            case 7:
                 system("cls");
                 liberarArvore(Arvore->raiz);
+                liberarHash(TabelaHash);
                 free(Arvore);
                 printf("\n\t==================================================\n");
                 printf("\t             FINALIZANDO O PROGRAMA...            \n");
@@ -110,11 +103,12 @@ int main()
 {
     setlocale(LC_ALL, "Portuguese");
     Arv* Arvore = criaArvore();
+    Tab_hash* TabelaHash = CriaHash();
 
     Inci Teste={50,1024,2};
     Arvore->raiz=inserirIncidente(Arvore->raiz, Teste);
 
-    menu(Arvore);
+    menu(Arvore, TabelaHash);
 
     return 0;
 }

@@ -16,7 +16,7 @@ typedef struct Incidentes
 typedef struct Equipamento
 {
     int C_U_Id;
-    char nome[10];
+    char nome[11];
 
 }Equip;
 
@@ -152,7 +152,97 @@ int removerEquipamento (Tab_hash* tabela, int codigo)
     }
     return 0;
 }
+void adicionarEquipamento(Tab_hash* tabela)
+{
+    Equip novo;
+    int valido;
 
+    do{
+        system("cls");
+        printf("\n\t==================================================\n");
+        printf("\t             CADASTRAR EQUIPAMENTO                \n");
+        printf("\t==================================================\n");
+
+        printf("\n\tDigite o Código do Equipamento(4 Dígitos):");//se eu digitar um numero com 22caracteres ele estoura, transformando em
+        scanf("%d",&novo.C_U_Id);// um num negativo, hash m acha negativo
+        limpar_buffer();
+
+        if(buscarEquipamento(tabela, novo.C_U_Id))
+        {
+            system("cls");
+            printf("\n\tERRO!!! O Código do Equipamento já existe!");
+            printf("\n\t\t---APERTE ENTER PARA CONTINUAR---\n");
+            getchar();
+        }
+        if(novo.C_U_Id<1000 || novo.C_U_Id>9999)
+        {
+            system("cls");
+            printf("\n\tERRO!!! O Código tem que ter 4 dígitos!");
+            printf("\n\t\t---APERTE ENTER PARA CONTINUAR---\n");
+            getchar();
+        }
+
+
+    }while(novo.C_U_Id<1000 || novo.C_U_Id>9999 || buscarEquipamento(tabela, novo.C_U_Id)!= NULL);
+
+    do
+    {
+        valido = 0;
+        printf("\n\tDigite o Nome do Equipamento (Máximo 10 caracteres): ");
+        fgets(novo.nome, sizeof(novo.nome), stdin);
+
+        if (novo.nome[strlen(novo.nome) - 1] != '\n')
+        {
+            system("cls");
+            valido = 1;
+            limpar_buffer();
+            printf("\n\t!!! O nome do equipamento deve ter no máximo 10 caracteres !!!\n");
+        }
+        else
+        {
+            novo.nome[strcspn(novo.nome, "\n")] = '\0';
+            if (strlen(novo.nome) == 0)
+            {
+                system("cls");
+                valido = 1;
+                printf("\n\t!!! O nome do equipamento nao pode ficar vazio !!!\n");
+            }
+        }
+
+    } while (valido == 1);
+
+    inserirEquipamento(tabela, novo);
+
+    printf("\n\tEquipamento: %s (ID: %d) cadastrado com sucesso!\n", novo.nome, novo.C_U_Id);
+    printf("\n\t\t---APERTE ENTER PARA CONTINUAR---\n");
+    getchar();
+
+}
+
+
+
+
+
+
+void liberarHash(Tab_hash* tabela)
+{
+    NoHash* atual;
+    NoHash* pr;
+
+    for(int i = 0; i < Tam_hash; i++)
+    {
+        atual = tabela->hash[i];
+        pr = NULL;
+        while(atual != NULL)
+        {
+            pr=atual->prox;
+            free(atual);
+            atual=pr;
+        }
+    }
+    free(tabela);
+
+}
 
 
 
