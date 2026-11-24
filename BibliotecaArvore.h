@@ -13,13 +13,19 @@ typedef struct Incidentes
     int gravidade;
 } Inci;
 
+typedef struct NoListaInci
+{
+    int id_incidente;
+    struct NoListaInci *prox;
+} NoListaInci;
+
 typedef struct Equipamento
 {
     int C_U_Id;
     char nome[11];
-
+    NoListaInci *listaIncidentes;
 }Equip;
-
+// struct arvore
 typedef struct NoArvore
 {
     Inci info;
@@ -47,30 +53,19 @@ typedef struct NoHash
     struct NoHash *prox;
 }NoHash;
 
-typedef struct Tab_hash
+void inicializaHash(NoHash* hash[])
 {
-    NoHash *hash[Tam_hash];
-}Tab_hash;
-
-Tab_hash *CriaHash()
-{
-    Tab_hash* tabela = (Tab_hash*) malloc(sizeof(Tab_hash));
-
-    if (tabela != NULL)
+    for (int i = 0; i < Tam_hash; i++)
     {
-        for(int i = 0; i< Tam_hash; i++)
-        {
-            tabela->hash[i] = NULL;
-        }
+        hash[i] = NULL;
     }
-    return tabela;
 }
 
-int HashVazia(Tab_hash *tabela)
+int HashVazia(NoHash* hash[])
 {
-    for(int i = 0; i< Tam_hash; i++)
+    for (int i = 0; i < Tam_hash; i++)
     {
-        if(tabela->hash[i] != NULL)
+        if (hash[i] != NULL)
         {
             return 0;
         }
@@ -95,24 +90,22 @@ int funcaoHash(int codigo)
     return codigo%Tam_hash;
 }
 
-void inserirEquipamento(Tab_hash* tabela, Equip novoEquip)
+void inserirEquipamento(NoHash* Hash[], Equip novoEq)
 {
-    int indice = funcaoHash(novoEquip.C_U_Id);
+    int ind = funcaoHash(novoEq.C_U_Id);
 
     NoHash* novo = (NoHash*) malloc(sizeof(NoHash));
 
-    novo->info=novoEquip;
-
-    novo->prox= tabela->hash[indice];
-
-    tabela->hash[indice]= novo;
+    novo->info = novoEq;
+    novo->prox = Hash[ind];
+    Hash[ind] = novo;;
 }
 
-NoHash* buscarEquipamento(Tab_hash* tabela, int codigo)
+NoHash* buscarEquipamento(NoHash* TabHash[], int codigo)
 {
-    int indice= funcaoHash(codigo);
+    int ind= funcaoHash(codigo);
 
-    NoHash* atual = tabela->hash[indice];
+    NoHash* atual = TabHash[ind];
 
     while(atual != NULL)
     {
@@ -125,10 +118,10 @@ NoHash* buscarEquipamento(Tab_hash* tabela, int codigo)
     return NULL;
 }
 
-int removerEquipamento (Tab_hash* tabela, int codigo)
+int removerEquipamento (NoHash* TabHash[], int codigo)
 {
-    int indice= funcaoHash(codigo);
-    NoHash* atual = tabela->hash[indice];
+    int ind= funcaoHash(codigo);
+    NoHash* atual = TabHash[ind];
     NoHash* ante = NULL;
 
     while (atual != NULL)
@@ -137,7 +130,7 @@ int removerEquipamento (Tab_hash* tabela, int codigo)
         {
             if(ante ==NULL)
             {
-                tabela->hash[indice] = atual->prox;
+                TabHash[ind] = atual->prox;
             }
             else
             {
@@ -152,7 +145,7 @@ int removerEquipamento (Tab_hash* tabela, int codigo)
     }
     return 0;
 }
-void adicionarEquipamento(Tab_hash* tabela)
+void adicionarEquipamento(NoHash* TabHash[])
 {
     Equip novo;
     int valido;
@@ -163,17 +156,10 @@ void adicionarEquipamento(Tab_hash* tabela)
         printf("\t             CADASTRAR EQUIPAMENTO                \n");
         printf("\t==================================================\n");
 
-        printf("\n\tDigite o Código do Equipamento(4 Dígitos):");//se eu digitar um numero com 22caracteres ele estoura, transformando em
-        scanf("%d",&novo.C_U_Id);// um num negativo, hash m acha negativo
+        printf("\n\tDigite o Código do Equipamento(4 Dígitos):");
+        scanf("%d",&novo.C_U_Id);
         limpar_buffer();
 
-        if(buscarEquipamento(tabela, novo.C_U_Id))
-        {
-            system("cls");
-            printf("\n\tERRO!!! O Código do Equipamento já existe!");
-            printf("\n\t\t---APERTE ENTER PARA CONTINUAR---\n");
-            getchar();
-        }
         if(novo.C_U_Id<1000 || novo.C_U_Id>9999)
         {
             system("cls");
@@ -183,55 +169,63 @@ void adicionarEquipamento(Tab_hash* tabela)
         }
 
 
-    }while(novo.C_U_Id<1000 || novo.C_U_Id>9999 || buscarEquipamento(tabela, novo.C_U_Id)!= NULL);
+    }while(novo.C_U_Id<1000 || novo.C_U_Id>9999);
 
-    do
+    if(buscarEquipamento(TabHash, novo.C_U_Id)!=NULL)
     {
-        valido = 0;
-        printf("\n\tDigite o Nome do Equipamento (Máximo 10 caracteres): ");
-        fgets(novo.nome, sizeof(novo.nome), stdin);
+        system("cls");
+        printf("\n\tERRO!!! O Código do Equipamento já existe!");
+        printf("\n\t\t---APERTE ENTER PARA CONTINUAR---\n");
+        getchar();
+    }
+    else
+    {
+        do
+        {
+            valido = 0;
+            printf("\n\tDigite o Nome do Equipamento (Máximo 10 caracteres): ");
+            fgets(novo.nome, sizeof(novo.nome), stdin);
 
-        if (novo.nome[strlen(novo.nome) - 1] != '\n')
-        {
-            system("cls");
-            valido = 1;
-            limpar_buffer();
-            printf("\n\t!!! O nome do equipamento deve ter no máximo 10 caracteres !!!\n");
-        }
-        else
-        {
-            novo.nome[strcspn(novo.nome, "\n")] = '\0';
-            if (strlen(novo.nome) == 0)
+            if (novo.nome[strlen(novo.nome) - 1] != '\n')
             {
                 system("cls");
                 valido = 1;
-                printf("\n\t!!! O nome do equipamento nao pode ficar vazio !!!\n");
+                limpar_buffer();
+                printf("\n\t!!! O nome do equipamento deve ter no máximo 10 caracteres !!!\n");
             }
-        }
+            else
+            {
+                novo.nome[strcspn(novo.nome, "\n")] = '\0';
+                if (strlen(novo.nome) == 0)
+                {
+                    system("cls");
+                    valido = 1;
+                    printf("\n\t!!! O nome do equipamento nao pode ficar vazio !!!\n");
+                }
+            }
 
-    } while (valido == 1);
+        } while (valido == 1);
 
-    inserirEquipamento(tabela, novo);
+        novo.listaIncidentes = NULL;
+        inserirEquipamento(TabHash, novo);
 
-    printf("\n\tEquipamento: %s (ID: %d) cadastrado com sucesso!\n", novo.nome, novo.C_U_Id);
-    printf("\n\t\t---APERTE ENTER PARA CONTINUAR---\n");
-    getchar();
+        inserirEquipamento(TabHash, novo);
+
+        printf("\n\tEquipamento: %s (ID: %d) cadastrado com sucesso!\n", novo.nome, novo.C_U_Id);
+        printf("\n\t\t---APERTE ENTER PARA CONTINUAR---\n");
+        getchar();
+    }
 
 }
 
-
-
-
-
-
-void liberarHash(Tab_hash* tabela)
+void liberarHash(NoHash* tabHash[])
 {
     NoHash* atual;
     NoHash* pr;
 
     for(int i = 0; i < Tam_hash; i++)
     {
-        atual = tabela->hash[i];
+        atual = tabHash[i];
         pr = NULL;
         while(atual != NULL)
         {
@@ -239,9 +233,8 @@ void liberarHash(Tab_hash* tabela)
             free(atual);
             atual=pr;
         }
+        tabHash[i] = NULL;
     }
-    free(tabela);
-
 }
 
 

@@ -1,6 +1,6 @@
 #include "BibliotecaArvore.h"
 
-void menu(Arv* Arvore, Tab_hash* TabelaHash)
+void menu(Arv* Arvore, NoHash* TabelaHash[])
 {
     int opc;
     do {
@@ -103,7 +103,9 @@ int main()
 {
     setlocale(LC_ALL, "Portuguese");
     Arv* Arvore = criaArvore();
-    Tab_hash* TabelaHash = CriaHash();
+
+    NoHash* TabelaHash[Tam_hash];
+    inicializaHash(TabelaHash);
 
     Inci Teste={50,1024,2};
     Arvore->raiz=inserirIncidente(Arvore->raiz, Teste);
