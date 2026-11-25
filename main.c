@@ -10,7 +10,7 @@ void menu(Arv* Arvore, NoHash* TabelaHash[])
         printf("\n\t==================================================\n");
         printf("\t            GERENCIAMENTO DE FALHAS               \n");
         printf("\t==================================================\n");
-        printf("\t [1] Cadastrar Equipamento (Tabela Hash)          \n");
+        printf("\t [1] Cadastrar Equipamento                        \n");
         printf("\t [2] Registrar Incidente                          \n");
         printf("\t [3] Consultar Equipamento e Incidente            \n");
         printf("\t [4] Listar todos os Incidentes                   \n");
@@ -18,7 +18,7 @@ void menu(Arv* Arvore, NoHash* TabelaHash[])
         printf("\t [6] Excluir um Equipamento                       \n");
         printf("\t [7] Encerrar Programa                            \n");
         printf("\t--------------------------------------------------\n");
-        printf("\tDigite a opcao desejada: ");
+        printf("\tDigite a opcão desejada: ");
 
         scanf("%d", &opc);
         limpar_buffer();
@@ -30,17 +30,12 @@ void menu(Arv* Arvore, NoHash* TabelaHash[])
                 break;
 
             case 2:
-                adicionarIncidente(Arvore);
+                adicionarIncidente(Arvore, TabelaHash);
                 getchar();
                 break;
 
-            case 3://mostrar as coisa da HAsh
-                system("cls");
-                printf("\n\t==================================================\n");
-                printf("\t         CONSULTAR EQUIPAMENTO E INCIDENTE        \n");
-                printf("\t==================================================\n\n");
-
-                passa_Incidente(Arvore->raiz);
+            case 3:
+                consultarEquipamento(Arvore->raiz, TabelaHash);
                 break;
 
             case 4:
@@ -50,6 +45,7 @@ void menu(Arv* Arvore, NoHash* TabelaHash[])
                 printf("\t==================================================\n");
                 printf("\t%-15s | %-16s | %-10s\n",
                            "ID_INCIDENTE", "ID_EQUIPAMENTO", "GRAVIDADE");
+                printf("\t--------------------------------------------------\n");
                 ListaIncidentes(Arvore->raiz);
 
                 printf("\t==================================================\n");
@@ -59,18 +55,13 @@ void menu(Arv* Arvore, NoHash* TabelaHash[])
                 break;
 
             case 5:
-                system("cls");
-                printf("\n\t==================================================\n");
-                printf("\t                 EXCLUIR INCIDENTE                \n");
-                printf("\t==================================================\n");
-                excluirInsidente(Arvore);
+                excluirIncidente(Arvore, TabelaHash);
                 break;
             case 6:
                 system("cls");
                 printf("\n\t==================================================\n");
                 printf("\t                EXCLUIR EQUIPAMENTO               \n");
                 printf("\t==================================================\n");
-                printf("\n\t[Aguardando implementacao da Hash...]\n");
 
                 printf("\n\t\t---APERTE ENTER PARA CONTINUAR---\n");
                 getchar();
@@ -109,6 +100,8 @@ int main()
 
     Inci Teste={50,1024,2};
     Arvore->raiz=inserirIncidente(Arvore->raiz, Teste);
+    Inci a={12,1009,2};
+    Arvore->raiz=inserirIncidente(Arvore->raiz, a);
 
     menu(Arvore, TabelaHash);
 

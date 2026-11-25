@@ -25,6 +25,7 @@ typedef struct Equipamento
     char nome[11];
     NoListaInci *listaIncidentes;
 }Equip;
+
 // struct arvore
 typedef struct NoArvore
 {
@@ -99,6 +100,17 @@ void inserirEquipamento(NoHash* Hash[], Equip novoEq)
     novo->info = novoEq;
     novo->prox = Hash[ind];
     Hash[ind] = novo;;
+}
+
+void inserirInciNaLista(NoHash* equip, int Codigo_inci)
+{
+    NoListaInci* novo = (NoListaInci*) malloc(sizeof(NoListaInci));
+    if (novo != NULL)
+    {
+        novo->id_incidente = Codigo_inci;
+        novo->prox = equip->info.listaIncidentes;
+        equip->info.listaIncidentes = novo;
+    }
 }
 
 NoHash* buscarEquipamento(NoHash* TabHash[], int codigo)
@@ -209,8 +221,6 @@ void adicionarEquipamento(NoHash* TabHash[])
         novo.listaIncidentes = NULL;
         inserirEquipamento(TabHash, novo);
 
-        inserirEquipamento(TabHash, novo);
-
         printf("\n\tEquipamento: %s (ID: %d) cadastrado com sucesso!\n", novo.nome, novo.C_U_Id);
         printf("\n\t\t---APERTE ENTER PARA CONTINUAR---\n");
         getchar();
@@ -275,32 +285,6 @@ NoArv* inserirIncidente(NoArv* raiz, Inci novoIncidente)
     return raiz;
 }
 
-void adicionarIncidente(Arv* arvore)
-{
-    system("cls");
-    printf("\n\t==================================================\n");
-    printf("\t               REGISTRAR INCIDENTE                \n");
-    printf("\t==================================================\n");
-
-    Inci novo;
-
-    printf("\n\tDigite o ID do Incidente (2 digitos): ");
-    scanf("%d", &novo.N_U_Id);
-
-    printf("\tDigite o Codigo do Equipamento (4 digitos): ");
-    scanf("%d", &novo.id_equip);
-
-    printf("\tDigite a Gravidade (1-Baixa, 2-Media, 3-Alta): ");
-    scanf("%d", &novo.gravidade);
-    limpar_buffer();
-
-    arvore->raiz=inserirIncidente(arvore->raiz, novo);
-
-    printf("\n\tIncidente enviado para a arvore!\n");
-
-    printf("\n\t\t---APERTE ENTER PARA CONTINUAR---\n");
-}
-
 NoArv* BuscaIncidente(NoArv* raiz,int Incidente)
 {
     if(raiz!=NULL)
@@ -325,6 +309,178 @@ NoArv* BuscaIncidente(NoArv* raiz,int Incidente)
     return NULL;
 }
 
+void adicionarIncidente(Arv* arvore, NoHash* TabHash[])
+{
+    Inci novo;
+
+    do{
+        system("cls");
+        printf("\n\t==================================================\n");
+        printf("\t               REGISTRAR INCIDENTE                \n");
+        printf("\t==================================================\n");
+
+            printf("\n\tDigite o Código do Equipamento(4 Dígitos):");
+            scanf("%d",&novo.id_equip);
+            limpar_buffer();
+
+            if(novo.id_equip<1000 || novo.id_equip>9999)
+            {
+                system("cls");
+                printf("\n\tERRO!!! O Código tem que ter 4 dígitos!");
+                printf("\n\t\t---APERTE ENTER PARA CONTINUAR---\n");
+                getchar();
+            }
+    }while(novo.id_equip<1000 || novo.id_equip>9999);
+
+    NoHash* equip = buscarEquipamento(TabHash, novo.id_equip);
+
+    if(equip == NULL)
+    {
+            system("cls");
+            printf("\n\tERRO!!! Código não encontrado!");
+            printf("\n\t\t---APERTE ENTER PARA CONTINUAR---\n");
+            getchar();
+    }
+    else
+    {
+        do{
+            printf("\n\t--- Equipamento Encontrado ---\n");
+            printf("\tEquipamento: %s\n", equip->info.nome);
+            printf("\tID: %d\n", equip->info.C_U_Id);
+
+            printf("\n\tDigite o ID do Incidente (2 digitos): ");
+            scanf("%d", &novo.N_U_Id);
+            limpar_buffer();
+
+            if(novo.N_U_Id<10 || novo.N_U_Id>99)
+            {
+                system("cls");
+                printf("\n\tERRO!!! O ID do Incidente de ter 2 dígitos!");
+                printf("\n\t\t---APERTE ENTER PARA CONTINUAR---\n");
+                getchar();
+            }
+        }while(novo.N_U_Id<10 || novo.N_U_Id>99);
+
+        if (BuscaIncidente(arvore->raiz,novo.N_U_Id)!=NULL)
+        {
+                system("cls");
+                printf("\n\tERRO!!! Já existe um incidente com esse ID!");
+                printf("\n\t\t---APERTE ENTER PARA CONTINUAR---\n");
+                getchar();
+        }
+        else
+        {
+            do
+            {
+                printf("\tDigite a Gravidade (1-Baixa, 2-Media, 3-Alta): ");
+                scanf("%d", &novo.gravidade);
+                limpar_buffer();
+
+                if(novo.gravidade<1 || novo.gravidade>3)
+                {
+                    system("cls");
+                    printf("\n\tA gravidade de estra entre (1-Baixa, 2-Media, 3-Alta)!");
+                    printf("\n\t\t---APERTE ENTER PARA CONTINUAR---\n");
+                    getchar();
+                }
+
+            }while(novo.gravidade<1 || novo.gravidade>3);
+
+            arvore->raiz=inserirIncidente(arvore->raiz, novo);
+            inserirInciNaLista(equip,novo.N_U_Id);
+
+            printf("\n\tIncidente cadastrado com sucesso!\n");
+
+            printf("\n\t\t---APERTE ENTER PARA CONTINUAR---\n");
+        }
+    }
+}
+
+void imprimirGradeEquipamento(NoArv* raiz, NoHash* equip)
+{
+    NoListaInci* atual = equip->info.listaIncidentes;
+
+    system("cls");
+    printf("\n\t==================================================\n");
+    printf("\t               DADOS DO EQUIPAMENTO               \n");
+    printf("\t==================================================\n");
+    printf("\t Código: %-10d | Nome: %-20s\n", equip->info.C_U_Id, equip->info.nome);
+    printf("\t==================================================\n");
+
+    if(atual==NULL)
+            {
+                printf("\n\t\tEste equipamento não possui incidentes!");
+                printf("\n\t\t---APERTE ENTER PARA CONTINUAR---\n");
+            }
+    else
+    {
+        printf("\t%-22s | %-25s\n", "ID_INCIDENTE", "GRAVIDADE");
+        printf("\t--------------------------------------------------\n");
+        while(atual!=NULL)
+        {
+            NoArv* noInci= BuscaIncidente(raiz, atual->id_incidente);
+
+            if (noInci != NULL)
+                {
+                    printf("\t%-22d | %-25d\n",
+                           noInci->info.N_U_Id, noInci->info.gravidade);
+                    printf("\t--------------------------------------------------\n");
+                }
+                atual = atual->prox;
+        }
+            printf("\t==================================================\n");
+            printf("\n\t\t---APERTE ENTER PARA CONTINUAR---\n");
+    }
+}
+
+void consultarEquipamento(NoArv* raiz, NoHash* TabHash[])
+{
+    Inci novo;
+    if(HashVazia(TabHash)==1)
+    {
+        system("cls");
+        printf("\n\tERRO! Não ha códigos cadastados!");
+        printf("\n\t\t---APERTE ENTER PARA CONTINUAR---\n");
+        getchar();
+    }
+    else
+    {
+        do{
+            system("cls");
+            printf("\n\t==================================================\n");
+            printf("\t            CONSULTAR EQUIPAMENTO E INSIDENTE \n");
+            printf("\t==================================================\n");
+
+            printf("\n\tDigite o Código do Equipamento(4 Dígitos):");
+            scanf("%d",&novo.id_equip);
+            limpar_buffer();
+
+            if(novo.id_equip<1000 || novo.id_equip>9999)
+            {
+                system("cls");
+                printf("\n\tERRO!!! O Código tem que ter 4 dígitos!");
+                printf("\n\t\t---APERTE ENTER PARA CONTINUAR---\n");
+                getchar();
+            }
+        }while(novo.id_equip<1000 || novo.id_equip>9999);
+
+        NoHash* equip = buscarEquipamento(TabHash, novo.id_equip);
+
+        if(equip == NULL)
+        {
+                system("cls");
+                printf("\n\tERRO!!! Código não encontrado!");
+                printf("\n\t\t---APERTE ENTER PARA CONTINUAR---\n");
+                getchar();
+        }
+        else
+        {
+            imprimirGradeEquipamento(raiz, equip);
+            getchar();
+        }
+    }
+}
+
 void passa_Incidente(NoArv* raiz)
 {
     int Incidente;
@@ -332,7 +488,7 @@ void passa_Incidente(NoArv* raiz)
         printf("\t!!!Sem incidentes!!!\n");
         printf("\t\t\t---APERTE ENTER PARA CONTINUAR---\n");
         getchar();
-    }
+}
     else{
         printf("\tDigite o código do Incidente a ser consultado:");
         scanf("%d", &Incidente);
@@ -430,39 +586,116 @@ NoArv* removerIncidente(NoArv* raiz,int remove_inci)
     }
 }
 
-void excluirInsidente(Arv* arvore)
+void removerInciDaLista(NoHash* equip, int Codigo_inci)
 {
-    system("cls");
-    int remover;
-    if(ArvVazia(arvore) || arvore->raiz == NULL)
+    NoListaInci* atual = equip->info.listaIncidentes;
+    NoListaInci* ante = NULL;
+    int achou = 0;
+
+    while (atual != NULL && achou == 0)
     {
-        printf("\t!!!Sem incidentes!!!\n");
-        printf("\t\t\t---APERTE ENTER PARA CONTINUAR---\n");
+        if (atual->id_incidente == Codigo_inci)
+        {
+            if (ante == NULL)
+            {
+                equip->info.listaIncidentes = atual->prox;
+            }
+            else
+            {
+                ante->prox = atual->prox;
+            }
+            free(atual);
+            achou = 1;
+        }
+        else
+        {
+            ante = atual;
+            atual = atual->prox;
+        }
+    }
+}
+
+void excluirIncidente(Arv* arvore, NoHash* TabHash[])
+{
+    Inci novo;
+    if(HashVazia(TabHash)== 1)
+    {
+        system("cls");
+        printf("\n\tERRO! Não ha códigos cadastados!");
+        printf("\n\t\t---APERTE ENTER PARA CONTINUAR---\n");
         getchar();
     }
-    else{
-        printf("\tDigite o código do Incidente a ser removido:");
-        scanf("%d", &remover);
+    else
+    {
+        do{
+            system("cls");
+            printf("\n\t==================================================\n");
+            printf("\t                 EXCLUIR INCIDENTE                \n");
+            printf("\t==================================================\n");
 
-        limpar_buffer();
+            printf("\n\tDigite o Código do Equipamento(4 Dígitos):");
+            scanf("%d",&novo.id_equip);
+            limpar_buffer();
 
-        NoArv* res= BuscaIncidente(arvore->raiz,remover);
+            if(novo.id_equip<1000 || novo.id_equip>9999)
+            {
+                system("cls");
+                printf("\n\tERRO!!! O Código tem que ter 4 dígitos!");
+                printf("\n\t\t---APERTE ENTER PARA CONTINUAR---\n");
+                getchar();
+            }
+        }while(novo.id_equip<1000 || novo.id_equip>9999);
 
-        if (res!=NULL)
+        NoHash* equip = buscarEquipamento(TabHash, novo.id_equip);
+        if(equip == NULL)
         {
-            printf("\n\t--- Incidente Removido ---\n");
-            printf("\tID do Incidente: %d\n", res->info.N_U_Id);
-            printf("\tID do Equipamento associado: %d\n", res->info.id_equip);
-            printf("\tNivel de Gravidade: %d\n", res->info.gravidade);
-            printf("\t\t\t---APERTE ENTER PARA CONTINUAR---\n");
+            system("cls");
+            printf("\n\tERRO!!! Código não encontrado!");
+            printf("\n\t\t---APERTE ENTER PARA CONTINUAR---\n");
             getchar();
-
-            arvore->raiz = removerIncidente(arvore->raiz, remover);
         }
-        else{
-            printf("\n\tIncidente não encontrado");
-            printf("\t\t\t---APERTE ENTER PARA CONTINUAR---\n");
-            getchar();
+        else
+        {
+            imprimirGradeEquipamento(arvore->raiz, equip);
+            if (equip->info.listaIncidentes == NULL)
+            {
+                getchar();
+            }
+            else
+            {
+                do{
+                    printf("\n\tDigite o ID do Incidente (2 digitos), que você deseja excluir: ");
+                    scanf("%d", &novo.N_U_Id);
+                    limpar_buffer();
+
+                    if(novo.N_U_Id<10 || novo.N_U_Id>99)
+                    {
+                        system("cls");
+                        printf("\n\tERRO!!! O ID do Incidente de ter 2 dígitos!");
+                        printf("\n\t\t---APERTE ENTER PARA CONTINUAR---\n");
+                        getchar();
+                    }
+                }while(novo.N_U_Id<10 || novo.N_U_Id>99);
+
+                NoArv* alvo = BuscaIncidente(arvore->raiz, novo.N_U_Id);
+
+                if (alvo == NULL || alvo->info.id_equip != equip->info.C_U_Id)
+                {
+                    system("cls");
+                    printf("\n\tERRO!!! Esse incidente não pertence a este equipamento!");
+                    printf("\n\t\t---APERTE ENTER PARA CONTINUAR---\n");
+                    getchar();
+                }
+                else
+                {
+                    removerInciDaLista(equip, novo.N_U_Id);
+                    arvore->raiz = removerIncidente(arvore->raiz, novo.N_U_Id);
+
+                    printf("\n\tIncidente excluido com sucesso!");
+                    printf("\n\t\t---APERTE ENTER PARA CONTINUAR---\n");
+                    getchar();
+                }
+            }
         }
     }
 }
