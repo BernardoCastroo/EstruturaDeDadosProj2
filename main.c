@@ -1,4 +1,4 @@
-#include "BibliotecaArvore.h"
+#include "BibliotecaGeral.h"
 
 void menu(Arv* Arvore, NoHash* TabelaHash[])
 {
@@ -31,7 +31,7 @@ void menu(Arv* Arvore, NoHash* TabelaHash[])
 
             case 2:
                 adicionarIncidente(Arvore, TabelaHash);
-                getchar();
+
                 break;
 
             case 3:
@@ -58,17 +58,14 @@ void menu(Arv* Arvore, NoHash* TabelaHash[])
                 excluirIncidente(Arvore, TabelaHash);
                 break;
             case 6:
-                system("cls");
-                printf("\n\t==================================================\n");
-                printf("\t                EXCLUIR EQUIPAMENTO               \n");
-                printf("\t==================================================\n");
-
+                excluirEquipamento(Arvore, TabelaHash);
                 printf("\n\t\t---APERTE ENTER PARA CONTINUAR---\n");
                 getchar();
                 break;
 
             case 7:
                 system("cls");
+                liberarLista(TabelaHash);
                 liberarArvore(Arvore->raiz);
                 liberarHash(TabelaHash);
                 free(Arvore);
@@ -97,11 +94,6 @@ int main()
 
     NoHash* TabelaHash[Tam_hash];
     inicializaHash(TabelaHash);
-
-    Inci Teste={50,1024,2};
-    Arvore->raiz=inserirIncidente(Arvore->raiz, Teste);
-    Inci a={12,1009,2};
-    Arvore->raiz=inserirIncidente(Arvore->raiz, a);
 
     menu(Arvore, TabelaHash);
 
